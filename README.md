@@ -1,9 +1,9 @@
 # Social-Network-Project
 This document describes a social network project similar to Instagram, developed with the following technologies:
 
-**Frontend:** HTML, CSS, JS, Django
-**Backend:** Python, FastAPI
-**Database:** PostgreSQL
++ **Frontend:** HTML, CSS, JS, Django
++ **Backend:** Python, FastAPI
++ **Database:** PostgreSQL
 
 ## Features:
 
@@ -20,7 +20,7 @@ This document describes a social network project similar to Instagram, developed
 
 The project will be implemented as a monolith with the following components:
 
-**Web Server:** Apache or Nginx will serve the frontend static files and redirect requests to the Django application.
-**Django Application:** It will handle the user interface requests and interact with the FastAPI API.
-**FastAPI API:** It will export CRUD functionalities for users, posts, comments, etc. in JSON format.
-**PostgreSQL Database:** It will store all the information of the social network, such as users, posts, comments, relationships between users, etc.
++ **Web Server:** Apache or Nginx will serve the frontend static files and redirect requests to the Django application.
++ **Django Application:** It will handle the user interface requests and interact with the FastAPI API.
++ **FastAPI API:** It will export CRUD functionalities for users, posts, comments, etc. in JSON format.
++ **PostgreSQL Database:** It will store all the information of the social network, such as users, posts, comments, relationships between users, etc.
