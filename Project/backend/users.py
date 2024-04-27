@@ -1,5 +1,5 @@
 from pydantic import BaseModel, EmailStr
-from datetime import datetime, date 
+from datetime import datetime, date
 
 
 class UserModel(BaseModel):
@@ -13,5 +13,4 @@ class UserModel(BaseModel):
     birthday: date
     profile_picture: str
     created_at : datetime
-
 
