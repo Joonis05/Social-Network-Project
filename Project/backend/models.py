@@ -1,12 +1,7 @@
-from sqlalchemy import String, Integer, DateTime
+from sqlalchemy import String, Integer, DateTime, ForeignKey
 from sqlalchemy.orm import DeclarativeBase
-from sqlalchemy.orm import Mapped, mapped_column
-from sqlalchemy import create_engine
-from sqlalchemy.orm import sessionmaker
+from sqlalchemy.orm import Mapped, mapped_column, Relationship
 from datetime import datetime
-
-engine = create_engine("postgresql://joonis:0205@localhost/db_joonis")
-Session = sessionmaker(engine)
 
 class Base(DeclarativeBase):
     pass
@@ -25,13 +20,31 @@ class User(Base):
     created_at = mapped_column(DateTime(), default=datetime.utcnow, nullable=False)
     updated_at = mapped_column(DateTime(), default=datetime.utcnow, onupdate=datetime.utcnow, nullable=False)
 
-    def __str__(self):
-        return self.username
+class Post(Base):
+    __tablename__ = "posts"
 
+    id : Mapped[int] = mapped_column(Integer, primary_key=True)
+    content : Mapped[str] = mapped_column(String, nullable=False)
+    created_at : Mapped[str] = mapped_column(DateTime, default=datetime.utcnow, nullable=False)
+    updated_at : Mapped[str] = mapped_column(DateTime, default=datetime.utcnow, nullable=False)
+    user_id : Mapped[int] = mapped_column(Integer, ForeignKey("users.id"))
+    
+    user = Relationship("User", back_populates="posts")
 
-if __name__ == "__main__":
-    Base.metadata.drop_all(engine)
-    Base.metadata.create_all(engine)
+class Comments(Base):
+    __tablename__ = "comments"
+
+    id : Mapped[int] = mapped_column(Integer, primary_key=True)
+    content : Mapped[str] = mapped_column(String, nullable=False)
+    created_at : Mapped[str] = mapped_column(DateTime, default=datetime.utcnow, nullable=False)
+    updated_at : Mapped[str] = mapped_column(DateTime, default=datetime.utcnow, nullable=False)
+    user_id : Mapped[int] = mapped_column(Integer, ForeignKey("users.id"))
+    post_id : Mapped[int] = mapped_column(Integer, ForeignKey("posts.id"))
+    
+    
+    user = Relationship("User", back_populates="comments")
+    post = Relationship("Post", back_populates="comments")
+
 
 
 
