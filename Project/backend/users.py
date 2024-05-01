@@ -4,11 +4,11 @@ from datetime import date, datetime
 from database import User
 from pydantic import BaseModel, EmailStr
 from sqlalchemy import create_engine
-from sqlalchemy.orm import Session
+from sqlalchemy.orm import sessionmaker
 
 engine = create_engine("")
-Session = Session(engine)
-
+Session = sessionmaker(engine)
+session = Session()
 
 
 class UserModel(BaseModel):
@@ -27,17 +27,18 @@ class UserModel(BaseModel):
         created_at (datetime): Date and time the user was created.
     """
 
-    id : int
-    name : str
-    username : str
-    email : EmailStr
-    password : str
-    biography : str
+    id: int
+    name: str
+    username: str
+    email: EmailStr
+    password: str
+    biography: str
     birthday: date
     profile_picture: str
-    created_at : datetime.utcnow
+    created_at: datetime.utcnow
 
-class UserLogin(BaseModel):
+
+class UserCredentials(BaseModel):
     """
     Represents user credentials for login purposes.
 
@@ -45,10 +46,12 @@ class UserLogin(BaseModel):
         username (str): User's unique username for login.
         password (str): User's password (assumed to be provided encrypted).
     """
-    username : str
-    password : str
 
-def create_user(user : UserModel):
+    username: str
+    password: str
+
+
+def create_user(user: UserModel):
     """
     Creates a new user in the system.
 
@@ -65,7 +68,7 @@ def create_user(user : UserModel):
     Returns:
         UserModel: The newly created user object.
     """
-    if len(user.name) < 3 or len(user.username) > 64:
+    if len(user.name) < 3 or len(user.name) > 64:
         raise ValueError("The name must be between 3 and 64 characters")
     if len(user.username) < 3 or len(user.username) > 64:
         raise ValueError("The username must be between 3 and 64 characters")
@@ -76,18 +79,36 @@ def create_user(user : UserModel):
 
     password_hash = hashlib.sha256(user.password)
     new_user = User(
-        name = user.name,
-        username = user.username,
-        email = user.email,
-        password = password_hash,
-        biography = user.biography,
-        birthday = user.birthday,
-        profile_picture = user.profile_picture
-        )
+        name=user.name,
+        username=user.username,
+        email=user.email,
+        password=password_hash,
+        biography=user.biography,
+        birthday=user.birthday,
+        profile_picture=user.profile_picture,
+    )
 
-    Session.add(new_user)
-    Session.commit()
+    session.add(new_user)
+    session.commit()
     return new_user
-        
 
 
+def authenticate_user(userc: UserCredentials):
+    """
+    Attempts to authenticate a user based on their credentials.
+
+    Args:
+        userc (UserCredentials): A UserCredentials object containing username and password.
+
+    Returns:
+        Optional[User]: The authenticated user object if successful, otherwise None.
+    """
+    user = session.query(User).filter_by(userc.username == User.username).first()
+    if user:
+        password_hash = hashlib.sha256(userc.password)
+        if password_hash == user.password:
+            return user
+        else:
+            return None
+    else:
+        return None
