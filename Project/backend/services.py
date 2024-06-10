@@ -54,6 +54,16 @@ def create_user(nuser: UserModel):
 
 @app.post("/authenticate_user")
 def authenticate_user(userc: UserCredentials):
+    """
+    This function authenticates a user based on their username and password
+
+    Parameters:
+    userc (UserCredentials): A UserCredentials object containing the user's username and password
+
+    Returns:
+    dict: A dictionary containing a message indicating whether the user was authenticated successfully or not
+
+    """
     query = session.query(User).filter_by(username=userc.username).first()
     if query:
         encode_password = userc.password.encode("utf-8")
@@ -68,6 +78,16 @@ def authenticate_user(userc: UserCredentials):
         return {"message": "Invalid username"}
 
 
+@app.get("/get_user")
+def get_user(username: str):
+    query = session.query(User).filter_by(username=username).first()
+    if query:
+        return {"name": query.name, 
+                "username": query.username, 
+                "biography": query.biography, 
+                "profile_picture": query.profile_picture}
+    else:
+        return {"message": "User not found"}
 
 
 if __name__ == "__main__":
