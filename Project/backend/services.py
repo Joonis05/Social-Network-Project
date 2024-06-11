@@ -103,6 +103,21 @@ def follow_user(follow: FollowModel):
     else:
         return {"message": "Invalid username"}
     
+@app.put("/unfollow_user")
+def unfollow_user(unfollow: FollowModel):
+    query1 = session.query(User).filter_by(username=unfollow.followed).first()
+    query2 = session.query(User).filter_by(username=unfollow.follower).first()
+    if query1 and query2:
+        id1 = Following(following_id=query1.id)
+        id2 = Followers(following_id=query2.id)
+
+        query1.following.remove(id1)
+        query2.following.remove(id2)
+        session.commit()
+        return {"message": "User unfollowed successfully"}
+    else:
+        return {"message": "Invalid username"}
+    
 @app.get("/get_followers")
 def get_followers(username: str):
     query = session.query(User).filter_by(username=username).first()
@@ -118,6 +133,8 @@ def get_following(username: str):
         return {"following": query.following}
     else:
         return {"message": "User not found"}
+    
+
 
 if __name__ == "__main__":
 
