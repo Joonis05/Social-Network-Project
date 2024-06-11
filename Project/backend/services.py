@@ -1,10 +1,10 @@
 from fastapi import FastAPI
 import uvicorn
-from models import UserModel, UserCredentials, FollowModel
+from models import UserModel, UserCredentials, FollowModel, PostModel
 import hashlib
 from sqlalchemy.orm import sessionmaker
 from database import engine
-from database import User, Followers, Following
+from database import User, Followers, Following, Post
 
 Session = sessionmaker(bind=engine)
 session = Session()
@@ -32,7 +32,8 @@ def create_user(nuser: UserModel):
     """
     
     query = session.query(User).filter_by(username=nuser.username).first()
-    if query:
+    email = session.query(User).filter_by(email=nuser.email).first()
+    if query or email:
         return {"message": "User already exists"}
     else: 
         encode_password = nuser.password.encode("utf-8")
@@ -92,12 +93,13 @@ def get_user(username: str):
 def follow_user(follow: FollowModel):
     query1 = session.query(User).filter_by(username=follow.followed).first()
     query2 = session.query(User).filter_by(username=follow.follower).first()
+
     if query1 and query2:
-        id1 = Following(following_id=query1.id)
-        id2 = Followers(following_id=query2.id)
+        id1 = Following(user_id=query2.id, following_id=query1.id)
+        id2 = Followers(user_id=query1.id, follower_id=query2.id)
 
         query1.following.append(id1)
-        query2.following.append(id2)
+        query2.followers.append(id2)
         session.commit()
         return {"message": "User followed successfully"}
     else:
@@ -107,14 +109,15 @@ def follow_user(follow: FollowModel):
 def unfollow_user(unfollow: FollowModel):
     query1 = session.query(User).filter_by(username=unfollow.followed).first()
     query2 = session.query(User).filter_by(username=unfollow.follower).first()
+
     if query1 and query2:
-        id1 = Following(following_id=query1.id)
-        id2 = Followers(following_id=query2.id)
+        id1 = Following(user_id=query2.id, following_id=query1.id)
+        id2 = Followers(user_id=query1.id, follower_id=query2.id)
 
         query1.following.remove(id1)
-        query2.following.remove(id2)
+        query2.followers.remove(id2)
         session.commit()
-        return {"message": "User unfollowed successfully"}
+        return {"message": "User followed successfully"}
     else:
         return {"message": "Invalid username"}
     
@@ -134,8 +137,54 @@ def get_following(username: str):
     else:
         return {"message": "User not found"}
     
+app.post("/create_post")
+def create_post(post: PostModel):
+    """
+    This function creates a new post in the database
 
+    Parameters:
+    post (PostModel): A PostModel object containing the post's information
+
+    Returns:
+    dict: A dictionary containing a message indicating whether the post was created successfully or not
+
+    """
+    query = session.query(User).filter_by(username=post.username).first()
+    if query:
+        post = Post(content=post.content, user_id=query.id)
+        query.posts.append(post)
+        session.commit()
+        return {"message": "Post created successfully"}
+    else:
+        return {"message": "Invalid username"}
+
+
+    
 
 if __name__ == "__main__":
+
+    user1 = UserModel(name="John", username="john", email="john@example.com", password="password", biography="I am a student", profile_picture="https://example.com/john.jpg")
+    user2 = UserModel(name="Jane", username="jane", email="jane@example.com", password="password", biography="I am a teacher", profile_picture="https://example.com/jane.jpg")
+    user3 = UserModel(name="Bob", username="bob", email="bob@example.com", password="password", biography="I am a teacher", profile_picture="https://example.com/bob.jpg")
+    user4 = UserModel(name="Alice", username="alice", email="alice@example.com", password="password", biography="I am a student", profile_picture="https://example.com/alice.jpg")
+    user5 = UserModel(name="Bob", username="bob", email="bob1@example.com", password="password", biography="I am a teacher", profile_picture="https://example.com/bob.jpg")
+
+    print(create_user(user1))
+    print(create_user(user2))
+    print(create_user(user3))
+    print(create_user(user4))
+    print(create_user(user5))
+
+    follow1 = FollowModel(follower="john", followed="bob")
+    follow2 = FollowModel(follower="bob", followed="john")
+    follow3 = FollowModel(follower="john", followed="alice")
+
+    print(follow_user(follow1))
+    print(follow_user(follow2))
+    print(follow_user(follow3))
+
+    
+    
+
 
     #uvicorn.run("services:app", host="localhost", port=8000)
