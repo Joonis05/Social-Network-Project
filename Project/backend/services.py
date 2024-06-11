@@ -1,12 +1,10 @@
 from fastapi import FastAPI
 import uvicorn
-from database import User
-from models import UserModel, UserCredentials
+from models import UserModel, UserCredentials, FollowModel
 import hashlib
-from sqlalchemy import create_engine
 from sqlalchemy.orm import sessionmaker
 from database import engine
-from database import User
+from database import User, Followers, Following
 
 Session = sessionmaker(bind=engine)
 session = Session()
@@ -89,6 +87,37 @@ def get_user(username: str):
     else:
         return {"message": "User not found"}
 
+
+@app.put("/follow_user")
+def follow_user(follow: FollowModel):
+    query1 = session.query(User).filter_by(username=follow.followed).first()
+    query2 = session.query(User).filter_by(username=follow.follower).first()
+    if query1 and query2:
+        id1 = Following(following_id=query1.id)
+        id2 = Followers(following_id=query2.id)
+
+        query1.following.append(id1)
+        query2.following.append(id2)
+        session.commit()
+        return {"message": "User followed successfully"}
+    else:
+        return {"message": "Invalid username"}
+    
+@app.get("/get_followers")
+def get_followers(username: str):
+    query = session.query(User).filter_by(username=username).first()
+    if query:
+        return {"followers": query.followers}
+    else:
+        return {"message": "User not found"}
+    
+@app.get("/get_following")
+def get_following(username: str):
+    query = session.query(User).filter_by(username=username).first()
+    if query:
+        return {"following": query.following}
+    else:
+        return {"message": "User not found"}
 
 if __name__ == "__main__":
 
