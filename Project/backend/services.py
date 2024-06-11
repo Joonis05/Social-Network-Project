@@ -1,10 +1,10 @@
 from fastapi import FastAPI
 import uvicorn
-from models import UserModel, UserCredentials, FollowModel, PostModel
+from models import UserModel, UserCredentials, FollowModel, PostModel, CommentModel
 import hashlib
 from sqlalchemy.orm import sessionmaker
 from database import engine
-from database import User, Followers, Following, Post
+from database import User, Followers, Following, Post, Comments
 
 Session = sessionmaker(bind=engine)
 session = Session()
@@ -243,6 +243,27 @@ def get_posts(username: str):
     else:
         return {"message": "User not found"}
     
+@app.post("/create_comment")
+def create_comment(comment: CommentModel):
+    """
+    This function creates a new comment in the database
+
+    Parameters:
+    comment (CommentModel): A CommentModel object containing the comment's information
+
+    Returns:
+    dict: A dictionary containing a message indicating whether the comment was created successfully or not
+
+    """
+    queryu = session.query(User).filter_by(username=comment.username).first()
+    queryp = session.query(Post).filter_by(id=comment.post_id).first()
+    if queryu and queryp:
+        comment = Comments(content=comment.content, user_id=queryu.id, post_id=comment.post_id)
+        queryp.comments.append(comment)
+        session.commit()
+        return {"message": "Comment created successfully"}
+    else:
+        return {"message": "Invalid username"}
 
 
 
@@ -262,7 +283,21 @@ if __name__ == "__main__":
     print(create_user(user4))
     print(create_user(user5))
 
-    print(get_posts("jane"))
+    post1 = PostModel(content="This is a post", username="john")
+    post2 = PostModel(content="This is another post", username="jane")
+    post3 = PostModel(content="This is a post", username="bob")
+
+    print(create_post(post1))
+    print(create_post(post2))
+    print(create_post(post3))
+
+    comment1 = CommentModel(content="This is a comment", username="john", post_id=1)
+    comment2 = CommentModel(content="This is another comment", username="jane", post_id=1)
+    comment3 = CommentModel(content="This is a comment", username="bob", post_id=1)
+
+    print(create_comment(comment1))
+    print(create_comment(comment2))
+    print(create_comment(comment3))
 
     
 
