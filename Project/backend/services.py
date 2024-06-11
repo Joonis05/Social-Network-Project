@@ -139,7 +139,13 @@ def get_followers(username: str):
 def get_following(username: str):
     query = session.query(User).filter_by(username=username).first()
     if query:
-        return {"following": query.following}
+        following = []
+        for i in query.following:
+            id_ = i.user_id
+            user = get_user(id_)
+            following.append(user["username"])
+
+        return {"following": following}
     else:
         return {"message": "User not found"}
     
@@ -191,6 +197,7 @@ if __name__ == "__main__":
 
 
     print(get_followers("john"))
+    print(get_following("john"))
     
 
 
