@@ -135,18 +135,19 @@ def unfollow_user(unfollow: FollowModel):
     Returns:
     dict: A dictionary containing a message indicating whether the user was unfollowed successfully or not
     """
+    #TODO add unfollow logic
 
-    query1 = session.query(User).filter_by(username=unfollow.followed).first()
-    query2 = session.query(User).filter_by(username=unfollow.follower).first()
+    query1 = session.query(User).filter_by(username=unfollow.follower).first()
+    query2 = session.query(User).filter_by(username=unfollow.followed).first()
 
     if query1 and query2:
         id1 = Following(user_id=query2.id, following_id=query1.id)
         id2 = Followers(user_id=query1.id, follower_id=query2.id)
 
-        query1.following.remove(id2)
-        query2.followers.remove(id1)
+        query1.following.remove(id1)
+        query2.followers.remove(id2)
         session.commit()
-        return {"message": "User followed successfully"}
+        return {"message": "User unfollowed successfully"}
     else:
         return {"message": "Invalid username"}
     
@@ -185,7 +186,7 @@ def get_following(username: str):
     Returns:
     dict: A dictionary containing a list of the user's following
     """
-    
+
     query = session.query(User).filter_by(username=username).first()
     if query:
         following = []
@@ -219,6 +220,32 @@ def create_post(post: PostModel):
     else:
         return {"message": "Invalid username"}
 
+app.get("/get_posts")
+def get_posts(username: str):
+    """
+    This function retrieves the posts of a user based on their username
+
+    Parameters:
+    username (str): The username of the user whose posts to retrieve
+
+    Returns:
+    dict: A dictionary containing a list of the user's posts
+    """
+
+    query = session.query(User).filter_by(username=username).first()
+    if query:
+        posts = []
+        for i in query.posts:
+            id_ = i.user_id
+            user = get_user(id_)
+            posts.append(user["username"])
+
+        return {"posts": posts}
+    else:
+        return {"message": "User not found"}
+    
+
+
 
     
 
@@ -245,9 +272,6 @@ if __name__ == "__main__":
     print(follow_user(follow3))"""
 
 
-    print(get_followers("john"))
-    print(get_following("john"))
-    
 
 
     
