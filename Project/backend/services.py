@@ -10,16 +10,16 @@ Session = sessionmaker(bind=engine)
 session = Session()
 
 
-
 app = FastAPI()
+
 
 @app.get("/")
 def main():
     return "Hello World!"
 
+
 @app.post("/create_user")
 def create_user(nuser: UserModel):
-    
     """
     This function creates a new user in the database
 
@@ -30,22 +30,22 @@ def create_user(nuser: UserModel):
     dict: A dictionary containing a message indicating whether the user was created successfully or not
 
     """
-    
+
     query = session.query(User).filter_by(username=nuser.username).first()
     email = session.query(User).filter_by(email=nuser.email).first()
     if query or email:
         return {"message": "User already exists"}
-    else: 
+    else:
         encode_password = nuser.password.encode("utf-8")
         user = User(
-                    name=nuser.name, 
-                    username=nuser.username, 
-                    email=nuser.email,
-                    password= hashlib.sha256(encode_password).hexdigest(),
-                    biography=nuser.biography,
-                    profile_picture=nuser.profile_picture,    
-                )
-    
+            name=nuser.name,
+            username=nuser.username,
+            email=nuser.email,
+            password=hashlib.sha256(encode_password).hexdigest(),
+            biography=nuser.biography,
+            profile_picture=nuser.profile_picture,
+        )
+
         session.add(user)
         session.commit()
         return {"message": "User created successfully"}
@@ -90,10 +90,12 @@ def get_user(user_id: int):
     """
     query = session.query(User).filter_by(id=user_id).first()
     if query:
-        return {"name": query.name, 
-                "username": query.username, 
-                "biography": query.biography, 
-                "profile_picture": query.profile_picture}
+        return {
+            "name": query.name,
+            "username": query.username,
+            "biography": query.biography,
+            "profile_picture": query.profile_picture,
+        }
     else:
         return {"message": "User not found"}
 
@@ -123,7 +125,8 @@ def follow_user(follow: FollowModel):
         return {"message": "User followed successfully"}
     else:
         return {"message": "Invalid username"}
-    
+
+
 @app.put("/unfollow_user")
 def unfollow_user(unfollow: FollowModel):
     """
@@ -135,7 +138,7 @@ def unfollow_user(unfollow: FollowModel):
     Returns:
     dict: A dictionary containing a message indicating whether the user was unfollowed successfully or not
     """
-    #TODO add unfollow logic
+    # TODO add unfollow logic
 
     query1 = session.query(User).filter_by(username=unfollow.follower).first()
     query2 = session.query(User).filter_by(username=unfollow.followed).first()
@@ -150,7 +153,8 @@ def unfollow_user(unfollow: FollowModel):
         return {"message": "User unfollowed successfully"}
     else:
         return {"message": "Invalid username"}
-    
+
+
 @app.get("/get_followers")
 def get_followers(username: str):
     """
@@ -174,7 +178,8 @@ def get_followers(username: str):
         return {"followers": followers}
     else:
         return {"message": "User not found"}
-    
+
+
 @app.get("/get_following")
 def get_following(username: str):
     """
@@ -198,8 +203,11 @@ def get_following(username: str):
         return {"following": following}
     else:
         return {"message": "User not found"}
-    
+
+
 app.post("/create_post")
+
+
 def create_post(post: PostModel):
     """
     This function creates a new post in the database
@@ -220,7 +228,10 @@ def create_post(post: PostModel):
     else:
         return {"message": "Invalid username"}
 
+
 app.get("/get_posts")
+
+
 def get_posts(username: str):
     """
     This function retrieves the posts of a user based on their username
@@ -242,7 +253,8 @@ def get_posts(username: str):
         return {"posts": posts}
     else:
         return {"message": "User not found"}
-    
+
+
 @app.post("/create_comment")
 def create_comment(comment: CommentModel):
     """
@@ -258,12 +270,15 @@ def create_comment(comment: CommentModel):
     queryu = session.query(User).filter_by(username=comment.username).first()
     queryp = session.query(Post).filter_by(id=comment.post_id).first()
     if queryu and queryp:
-        comment = Comments(content=comment.content, user_id=queryu.id, post_id=comment.post_id)
+        comment = Comments(
+            content=comment.content, user_id=queryu.id, post_id=comment.post_id
+        )
         queryp.comments.append(comment)
         session.commit()
         return {"message": "Comment created successfully"}
     else:
         return {"message": "Invalid username"}
+
 
 @app.get("/get_comments")
 def get_comments(post_id: int):
@@ -285,53 +300,14 @@ def get_comments(post_id: int):
             user = get_user(id_)
             username_ = user["username"]
             content = i.content
-            comments.append({"username": username_, 
-                             "content": content})
+            comments.append({"username": username_, "content": content})
 
         return {"comments": comments}
-        
+
     else:
         return {"message": "Post not found"}
 
 
-    
-
 if __name__ == "__main__":
 
-    """user1 = UserModel(name="John", username="john", email="john@example.com", password="password", biography="I am a student", profile_picture="https://example.com/john.jpg")
-    user2 = UserModel(name="Jane", username="jane", email="jane@example.com", password="password", biography="I am a teacher", profile_picture="https://example.com/jane.jpg")
-    user3 = UserModel(name="Bob", username="bob", email="bob@example.com", password="password", biography="I am a teacher", profile_picture="https://example.com/bob.jpg")
-    user4 = UserModel(name="Alice", username="alice", email="alice@example.com", password="password", biography="I am a student", profile_picture="https://example.com/alice.jpg")
-    user5 = UserModel(name="Bob", username="bob", email="bob1@example.com", password="password", biography="I am a teacher", profile_picture="https://example.com/bob.jpg")
-
-    print(create_user(user1))
-    print(create_user(user2))
-    print(create_user(user3))
-    print(create_user(user4))
-    print(create_user(user5))
-
-    post1 = PostModel(content="This is a post", username="john")
-    post2 = PostModel(content="This is another post", username="jane")
-    post3 = PostModel(content="This is a post", username="bob")
-
-    print(create_post(post1))
-    print(create_post(post2))
-    print(create_post(post3))
-
-    comment1 = CommentModel(content="This is a comment", username="john", post_id=1)
-    comment2 = CommentModel(content="This is another comment", username="jane", post_id=1)
-    comment3 = CommentModel(content="This is a comment", username="bob", post_id=1)
-
-    print(create_comment(comment1))
-    print(create_comment(comment2))
-    print(create_comment(comment3))"""
-
-    print(get_comments(1))
-
-
-
-
-    
-
-
-    #uvicorn.run("services:app", host="localhost", port=8000)
+    uvicorn.run("services:app", host="localhost", port=8000)
