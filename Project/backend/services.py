@@ -265,13 +265,40 @@ def create_comment(comment: CommentModel):
     else:
         return {"message": "Invalid username"}
 
+@app.get("/get_comments")
+def get_comments(post_id: int):
+    """
+    This function retrieves the comments of a user based on their username
+
+    Parameters:
+    username (str): The username of the user whose comments to retrieve
+
+    Returns:
+    dict: A dictionary containing a list of the user's comments
+    """
+
+    query = session.query(Post).filter_by(id=post_id).first()
+    if query:
+        comments = []
+        for i in query.comments:
+            id_ = i.user_id
+            user = get_user(id_)
+            username_ = user["username"]
+            content = i.content
+            comments.append({"username": username_, 
+                             "content": content})
+
+        return {"comments": comments}
+        
+    else:
+        return {"message": "Post not found"}
 
 
     
 
 if __name__ == "__main__":
 
-    user1 = UserModel(name="John", username="john", email="john@example.com", password="password", biography="I am a student", profile_picture="https://example.com/john.jpg")
+    """user1 = UserModel(name="John", username="john", email="john@example.com", password="password", biography="I am a student", profile_picture="https://example.com/john.jpg")
     user2 = UserModel(name="Jane", username="jane", email="jane@example.com", password="password", biography="I am a teacher", profile_picture="https://example.com/jane.jpg")
     user3 = UserModel(name="Bob", username="bob", email="bob@example.com", password="password", biography="I am a teacher", profile_picture="https://example.com/bob.jpg")
     user4 = UserModel(name="Alice", username="alice", email="alice@example.com", password="password", biography="I am a student", profile_picture="https://example.com/alice.jpg")
@@ -297,9 +324,9 @@ if __name__ == "__main__":
 
     print(create_comment(comment1))
     print(create_comment(comment2))
-    print(create_comment(comment3))
+    print(create_comment(comment3))"""
 
-    
+    print(get_comments(1))
 
 
 
