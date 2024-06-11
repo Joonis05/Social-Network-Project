@@ -11,3 +11,7 @@ class UserModel(BaseModel):
 class UserCredentials(BaseModel):
     username: str
     password: str
+
+class FollowModel(BaseModel):
+    follower: str
+    followed: str
