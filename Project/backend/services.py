@@ -79,6 +79,15 @@ def authenticate_user(userc: UserCredentials):
 
 @app.get("/get_user")
 def get_user(user_id: int):
+    """
+    This function retrieves a user from the database based on their ID
+
+    Parameters:
+    user_id (int): The ID of the user to retrieve
+
+    Returns:
+    dict: A dictionary containing the user's information
+    """
     query = session.query(User).filter_by(id=user_id).first()
     if query:
         return {"name": query.name, 
@@ -91,6 +100,16 @@ def get_user(user_id: int):
 
 @app.put("/follow_user")
 def follow_user(follow: FollowModel):
+    """
+    This function follows a user based on their username
+
+    Parameters:
+    follow (FollowModel): A FollowModel object containing the username of the user to follow
+
+    Returns:
+    dict: A dictionary containing a message indicating whether the user was followed successfully or not
+    """
+
     query1 = session.query(User).filter_by(username=follow.follower).first()
     query2 = session.query(User).filter_by(username=follow.followed).first()
 
@@ -107,6 +126,16 @@ def follow_user(follow: FollowModel):
     
 @app.put("/unfollow_user")
 def unfollow_user(unfollow: FollowModel):
+    """
+    This function unfollows a user based on their username
+
+    Parameters:
+    unfollow (FollowModel): A FollowModel object containing the username of the user to unfollow
+
+    Returns:
+    dict: A dictionary containing a message indicating whether the user was unfollowed successfully or not
+    """
+
     query1 = session.query(User).filter_by(username=unfollow.followed).first()
     query2 = session.query(User).filter_by(username=unfollow.follower).first()
 
@@ -123,6 +152,16 @@ def unfollow_user(unfollow: FollowModel):
     
 @app.get("/get_followers")
 def get_followers(username: str):
+    """
+    This function retrieves the followers of a user based on their username
+
+    Parameters:
+    username (str): The username of the user whose followers to retrieve
+
+    Returns:
+    dict: A dictionary containing a list of the user's followers
+    """
+
     query = session.query(User).filter_by(username=username).first()
     if query:
         followers = []
@@ -137,6 +176,16 @@ def get_followers(username: str):
     
 @app.get("/get_following")
 def get_following(username: str):
+    """
+    This function retrieves the following of a user based on their username
+
+    Parameters:
+    username (str): The username of the user whose following to retrieve
+
+    Returns:
+    dict: A dictionary containing a list of the user's following
+    """
+    
     query = session.query(User).filter_by(username=username).first()
     if query:
         following = []
