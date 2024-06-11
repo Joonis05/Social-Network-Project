@@ -236,9 +236,8 @@ def get_posts(username: str):
     if query:
         posts = []
         for i in query.posts:
-            id_ = i.user_id
-            user = get_user(id_)
-            posts.append(user["username"])
+            post = i.content
+            posts.append(post)
 
         return {"posts": posts}
     else:
@@ -263,13 +262,9 @@ if __name__ == "__main__":
     print(create_user(user4))
     print(create_user(user5))
 
-    """follow1 = FollowModel(follower="john", followed="bob")
-    follow2 = FollowModel(follower="bob", followed="john")
-    follow3 = FollowModel(follower="john", followed="alice")
+    print(get_posts("jane"))
 
-    print(follow_user(follow1))
-    print(follow_user(follow2))
-    print(follow_user(follow3))"""
+    
 
 
 
