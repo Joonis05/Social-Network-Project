@@ -78,8 +78,8 @@ def authenticate_user(userc: UserCredentials):
 
 
 @app.get("/get_user")
-def get_user(username: str):
-    query = session.query(User).filter_by(username=username).first()
+def get_user(user_id: int):
+    query = session.query(User).filter_by(id=user_id).first()
     if query:
         return {"name": query.name, 
                 "username": query.username, 
@@ -91,8 +91,8 @@ def get_user(username: str):
 
 @app.put("/follow_user")
 def follow_user(follow: FollowModel):
-    query1 = session.query(User).filter_by(username=follow.followed).first()
-    query2 = session.query(User).filter_by(username=follow.follower).first()
+    query1 = session.query(User).filter_by(username=follow.follower).first()
+    query2 = session.query(User).filter_by(username=follow.followed).first()
 
     if query1 and query2:
         id1 = Following(user_id=query2.id, following_id=query1.id)
@@ -114,8 +114,8 @@ def unfollow_user(unfollow: FollowModel):
         id1 = Following(user_id=query2.id, following_id=query1.id)
         id2 = Followers(user_id=query1.id, follower_id=query2.id)
 
-        query1.following.remove(id1)
-        query2.followers.remove(id2)
+        query1.following.remove(id2)
+        query2.followers.remove(id1)
         session.commit()
         return {"message": "User followed successfully"}
     else:
@@ -125,7 +125,13 @@ def unfollow_user(unfollow: FollowModel):
 def get_followers(username: str):
     query = session.query(User).filter_by(username=username).first()
     if query:
-        return {"followers": query.followers}
+        followers = []
+        for i in query.followers:
+            id_ = i.user_id
+            user = get_user(id_)
+            followers.append(user["username"])
+
+        return {"followers": followers}
     else:
         return {"message": "User not found"}
     
@@ -175,15 +181,19 @@ if __name__ == "__main__":
     print(create_user(user4))
     print(create_user(user5))
 
-    follow1 = FollowModel(follower="john", followed="bob")
+    """follow1 = FollowModel(follower="john", followed="bob")
     follow2 = FollowModel(follower="bob", followed="john")
     follow3 = FollowModel(follower="john", followed="alice")
 
     print(follow_user(follow1))
     print(follow_user(follow2))
-    print(follow_user(follow3))
+    print(follow_user(follow3))"""
 
+
+    print(get_followers("john"))
     
+
+
     
 
 
