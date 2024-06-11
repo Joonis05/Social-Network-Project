@@ -26,6 +26,7 @@ class User(Base):
     followers : Mapped[List["Followers"]] = relationship(back_populates="user")
     following : Mapped[List["Following"]] = relationship(back_populates="user")
     posts : Mapped[List["Post"]] = relationship(back_populates="user")
+    comments : Mapped[List["Comments"]] = relationship(back_populates="user")
 
 class Followers(Base):
     __tablename__ = "followers"
@@ -47,8 +48,9 @@ class Post(Base):
     created_at : Mapped[str] = mapped_column(DateTime, default=datetime.utcnow, nullable=False)
     user_id : Mapped[int] = mapped_column(Integer, ForeignKey("users.id"))
     user : Mapped["User"] = relationship(back_populates="posts")
+    comment : Mapped[List["Comments"]] = relationship(back_populates="post")
 
-"""class Comments(Base):
+class Comments(Base):
     __tablename__ = "comments"
 
     id : Mapped[int] = mapped_column(Integer, primary_key=True)
@@ -58,9 +60,8 @@ class Post(Base):
     user_id : Mapped[int] = mapped_column(Integer, ForeignKey("users.id"))
     post_id : Mapped[int] = mapped_column(Integer, ForeignKey("posts.id"))
     
-    
-    user = Relationship("User", back_populates="comments")
-    post = Relationship("Post", back_populates="comments")"""
+    post : Mapped["Post"] = relationship(back_populates="comment")
+    user : Mapped["User"] = relationship(back_populates="comments")
 
 if __name__ == "__main__":
 
