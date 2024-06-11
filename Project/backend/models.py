@@ -20,3 +20,9 @@ class PostModel(BaseModel):
     id : int = None
     content : str
     username : str
+
+class CommentModel(BaseModel):
+    id : int = None
+    content : str
+    username : str
+    post_id : int 
