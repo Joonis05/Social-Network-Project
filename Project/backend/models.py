@@ -15,3 +15,8 @@ class UserCredentials(BaseModel):
 class FollowModel(BaseModel):
     follower: str
     followed: str
+
+class PostModel(BaseModel):
+    id : int = None
+    content : str
+    username : str
