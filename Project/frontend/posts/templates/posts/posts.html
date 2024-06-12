@@ -1,43 +1,47 @@
 {% extends 'base.html' %}
 {% load static %}
-
+    
 {% block content %}
 {% include 'navbar.html' %}
-    
+
 <div class="post-container">
     {% for post in posts %}
         <div class="post">
-            <div class="post-header d-flex">
-                <a href="#" >
-                    <img class="profile-pic" src="{% static 'images/default-pic.png' %}">
-                </a>  
-                <h6  class="post-user">{{ post.user.username }}</h6>
-                <ul class="navbar-nav justify-content-end ml-auto">
+            <div class="post-header d-flex justify-content-between">
+                <div class="d-flex">
+                    <a href="#">
+                        <img class="profile-pic" src="{% static 'images/default_pic.jpg' %}">
+                    </a>
+                    <h6 class="post-user">{{post.user.username}}</h6>
+                </div>
+                <ul class="navbar-nav justify-content-end">
                     <li class="nav-item dropdown">
-                        <a class="nav-link " href="#" id="navbarDropdown" role="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                        <a class="nav-link" href="#" id="navbarDropdown" role="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
                             <i class="fas fa-ellipsis-h" style="color: gray;"></i>
                         </a>
                         <div class="dropdown-menu" aria-labelledby="navbarDropdown">
-                            <a class="dropdown-item" href="#">Edit</a>
-                            <a class="dropdown-item" href="#">Delete</a>
+                            <a class="dropdown-item" href="{% url 'posts:edit-post' post.pk %}">Edit</a>
+                              <a class="dropdown-item" href="{% url 'posts:delete-post' post.pk %}">Delete</a>
+                              <a class="dropdown-item" href="#">Go to post</a>
+                              <a class="dropdown-item" href="#">Go to post</a>
                         </div>
                     </li>
                 </ul>
             </div>
             <div class="post-pic-container">
-                <img class="post-pic" src="{% static 'images/placeholder-vertical.png' %}">
+                <img class="post-pic" src="{{post.image.url}}">
             </div>
             <div class="post-footer">
                 <div class="likes d-flex">
-                    <a href="#"><i class="fas fa-heart fa-lg mr-1 mt-1" style="color: black"></i></a>
-                    <!-- <p><strong>{{post.likes}} Likes</strong></p> -->
+                    <a href="#"><i class="far fa-heart fa-lg mr-1 mt-1" style="color: black;"></i></a>
+                    <p><strong>{{post.likes}} likes</strong></p>
                 </div>
-                <!-- <p class="quote"><strong>{{post.user.username}}</strong> {{post.quote}}</p> -->
-                <!-- <a href="#"><p class="test-muted">See the </p>{{post.comments.all.count}} comments</a> -->
-                <small class="text-muted">{{post.created_at|date:"m d, Y"}}</small>
+                <p class="quote"><strong>{{post.user.username}}</strong> {{post.quote}}</p>
+                <a href="#"><p class="test-muted">See the {{post.comments.all.count}} comments</p></a>
+                <small class="test-muted">{{post.created_at|date:"M d, Y"}}</small>
             </div>
         </div>
     {% endfor %}
-</div> 
+</div>
 
 {% endblock %}
