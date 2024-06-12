@@ -6,7 +6,7 @@ from datetime import datetime
 from sqlalchemy import create_engine
 
 
-engine = create_engine("postgresql://fabian:0205@localhost:5432/postgres")
+engine = create_engine("postgresql://postgres:postgres@localhost:5432/postgres")
 
 
 class Base(DeclarativeBase):
