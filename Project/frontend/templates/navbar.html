@@ -1,18 +1,28 @@
+{% load static %}
+
 <nav class="navbar navbar-expand-lg bg-body-tertiary bg-white">
     <div class="container-fluid">
-      <a class="navbar-brand" href="#">Lara Gram</a>
+      <a class="navbar-brand" href="#">Lara Gram</a><i class="fa-brands fa-instagram "></i>
       <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav" aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
         <span class="navbar-toggler-icon"></span>
       </button>
       <div class="collapse navbar-collapse" id="navbarNav">
         <ul class="navbar-nav w-100 justify-content-end">
           <li class="nav-item">
-            <a class="plus-link" aria-current="page" href="#">+</a>
+            <a class="plus-link" aria-current="page" href="{% url 'posts:create-post' %}">new <i class="fa-solid fa-plus"></i></a>
           </li>
           <li class="nav-item">
-            <img class="profile-pic" src="" alt="profile-pic">
+            <img class="profile-pic" src="{% static 'images/default_pic.jpg' %}">
           </li>
         </ul>
       </div>
     </div>
   </nav>
+
+  {% if mesages %}
+    {% for message in mesages %}
+      <div class="alert alert-primary" {{mesages.tags}}>
+        {{message}}
+      </div>
+    {% endfor %}
+  {% endif %}

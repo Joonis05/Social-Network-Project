@@ -1,5 +1,14 @@
 {% extends 'base.html' %}
 
 {% block content %}
-    <h1>Register</h1>
+{% include 'navbar.html' %}
+
+<div class="profile-form-container">
+    <form class="form" method="POST" >
+        {% csrf_token %}
+        {{form.as_p}}
+        <button type="submit" class="btn btn-primary mt-2">check in</button>
+    </form>
+</div>
+
 {% endblock %}
